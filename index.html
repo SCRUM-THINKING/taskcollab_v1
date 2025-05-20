@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskCollab - Lista de Tareas Colaborativa</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f5f5f5;
+        }
+        .navbar-brand {
+            font-weight: bold;
+        }
+        .task-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        .task-item {
+            border-left: 3px solid #007bff;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            transition: all 0.2s;
+        }
+        .task-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.05);
+        }
+        .task-item.completed {
+            border-left-color: #28a745;
+            opacity: 0.7;
+        }
+        .task-item.completed .task-text {
+            text-decoration: line-through;
+            color: #6c757d;
+        }
+        .task-actions {
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.2s;
+        }
+        .task-item:hover .task-actions {
+            visibility: visible;
+            opacity: 1;
+        }
+        .app-header {
+            background-color: #007bff;
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="#">TaskCollab</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Mis Tareas</a>
+                    </li>
+                </ul>
+                <div>
+                    <span class="badge bg-primary">Usuario: Demo</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <!-- Header -->
+        <div class="app-header">
+            <h1 class="h3 mb-3">Lista de Tareas Colaborativa</h1>
+            <p class="mb-0">Una simple aplicación para gestionar tus tareas diarias</p>
+        </div>
+
+        <!-- Task Input Form -->
+        <div class="task-container mb-4">
+            <form id="task-form">
+                <div class="input-group">
+                    <input type="text" id="task-input" class="form-control" placeholder="Añadir nueva tarea...">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Añadir
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Task List -->
+        <div class="task-container">
+            <h2 class="h5 mb-3">Mis Tareas</h2>
+            
+            <div class="task-stats mb-3">
+                <div class="row text-center">
+                    <div class="col">
+                        <div class="bg-light p-2 rounded">
+                            <div class="h4 mb-0" id="total-tasks">0</div>
+                            <small>Total</small>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="bg-light p-2 rounded">
+                            <div class="h4 mb-0" id="completed-tasks">0</div>
+                            <small>Completadas</small>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="bg-light p-2 rounded">
+                            <div class="h4 mb-0" id="pending-tasks">0</div>
+                            <small>Pendientes</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <ul class="list-unstyled" id="task-list">
+                <!-- Las tareas se generarán dinámicamente aquí -->
+            </ul>
+            
+            <div id="empty-state" class="text-center py-4">
+                <i class="fas fa-clipboard-list fa-3x text-muted"></i>
+                <p class="mt-2 text-muted">No hay tareas pendientes. ¡Añade una nueva tarea!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Manejo de estado de la aplicación
+        const appState = {
+            tasks: [],
+            nextId: 1
+        };
+
+        // Referencias DOM
+        const taskForm = document.getElementById('task-form');
+        const taskInput = document.getElementById('task-input');
+        const taskList = document.getElementById('task-list');
+        const emptyState = document.getElementById('empty-state');
+        const totalTasksElement = document.getElementById('total-tasks');
+        const completedTasksElement = document.getElementById('completed-tasks');
+        const pendingTasksElement = document.getElementById('pending-tasks');
+
+        // Función para renderizar la lista de tareas
+        function renderTasks() {
+            // Actualizar estadísticas
+            const completedTasks = appState.tasks.filter(task => task.completed).length;
+            totalTasksElement.textContent = appState.tasks.length;
+            completedTasksElement.textContent = completedTasks;
+            pendingTasksElement.textContent = appState.tasks.length - completedTasks;
+            
+            // Mostrar u ocultar el estado vacío
+            if (appState.tasks.length === 0) {
+                emptyState.style.display = 'block';
+                taskList.innerHTML = '';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            
+            // Generar HTML para cada tarea
+            taskList.innerHTML = appState.tasks.map(task => `
+                <li class="task-item ${task.completed ? 'completed' : ''}" data-id="${task.id}">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <input type="checkbox" class="form-check-input me-2 task-checkbox" 
+                                ${task.completed ? 'checked' : ''}>
+                            <span class="task-text">${task.text}</span>
+                        </div>
+                        <div class="task-actions">
+                            <button class="btn btn-sm btn-danger delete-task">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </li>
+            `).join('');
+            
+            // Agregar event listeners para los checkboxes y botones de eliminar
+            document.querySelectorAll('.task-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', toggleTaskComplete);
+            });
+            
+            document.querySelectorAll('.delete-task').forEach(button => {
+                button.addEventListener('click', deleteTask);
+            });
+        }
+
+        // Función para añadir una nueva tarea
+        function addTask(text) {
+            const newTask = {
+                id: appState.nextId++,
+                text: text,
+                completed: false,
+                createdAt: new Date()
+            };
+            
+            appState.tasks.push(newTask);
+            saveToLocalStorage();
+            renderTasks();
+        }
+
+        // Función para marcar/desmarcar una tarea como completada
+        function toggleTaskComplete(e) {
+            const taskItem = e.target.closest('.task-item');
+            const taskId = parseInt(taskItem.dataset.id);
+            
+            const task = appState.tasks.find(t => t.id === taskId);
+            if (task) {
+                task.completed = e.target.checked;
+                saveToLocalStorage();
+                renderTasks();
+            }
+        }
+
+        // Función para eliminar una tarea
+        function deleteTask(e) {
+            const taskItem = e.target.closest('.task-item');
+            const taskId = parseInt(taskItem.dataset.id);
+            
+            appState.tasks = appState.tasks.filter(task => task.id !== taskId);
+            saveToLocalStorage();
+            renderTasks();
+        }
+
+        // Guardar en localStorage
+        function saveToLocalStorage() {
+            localStorage.setItem('taskCollab', JSON.stringify(appState));
+        }
+
+        // Cargar desde localStorage
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('taskCollab');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                appState.tasks = parsed.tasks || [];
+                appState.nextId = parsed.nextId || 1;
+            }
+        }
+
+        // Event listeners
+        taskForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const text = taskInput.value.trim();
+            
+            if (text) {
+                addTask(text);
+                taskInput.value = '';
+                taskInput.focus();
+            }
+        });
+
+        // Inicializar la aplicación
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFromLocalStorage();
+            renderTasks();
+        });
+    </script>
+</body>
+</html>
