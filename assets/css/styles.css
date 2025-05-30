@@ -1,0 +1,139 @@
+/**
+ * Estilos principales de TaskCollab
+ * 
+ * Este archivo contiene todos los estilos personalizados de la aplicación,
+ * organizados por componentes y siguiendo una estructura modular.
+ */
+
+/* ===== ESTILOS GLOBALES ===== */
+/* Configuración del fondo y estructura base de la página */
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background-image: url('../images/fondo.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ===== BARRA DE NAVEGACIÓN ===== */
+/* Estilos para la barra de navegación transparente */
+.navbar {
+    background-color: transparent !important;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    color: white !important;
+}
+
+.nav-link {
+    color: white !important;
+}
+
+/* Estilo para la insignia de usuario */
+.badge {
+    background-color: #4361ee !important;
+}
+
+/* ===== CONTENEDOR PRINCIPAL ===== */
+.container {
+    max-width: 1200px;
+}
+
+/* ===== CONTENEDORES DE TAREAS ===== */
+/* Estilo base para los contenedores de tareas y formularios */
+.task-container {
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+/* ===== FORMULARIO DE ENTRADA ===== */
+/* Estilos para el campo de entrada y botón de nueva tarea */
+.input-group .form-control {
+    border-radius: 8px 0 0 8px;
+    border: 1px solid #ddd;
+    padding: 12px 15px;
+}
+
+.input-group .btn-primary {
+    border-radius: 0 8px 8px 0;
+    background-color: #4361ee;
+    border-color: #4361ee;
+    padding: 0 20px;
+}
+
+/* ===== PANEL DE ESTADÍSTICAS ===== */
+/* Estilos para el panel de contadores de tareas */
+.task-stats .col div {
+    background-color: rgba(230, 235, 255, 0.5);
+    border-radius: 8px;
+    padding: 15px 10px;
+}
+
+.task-stats .h4 {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #4361ee;
+}
+
+/* ===== ELEMENTOS DE TAREA ===== */
+/* Estilos para cada elemento individual de la lista de tareas */
+.task-item {
+    border-left: 3px solid #4361ee;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    background-color: rgba(248, 249, 250, 0.7);
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+/* Efecto hover para las tareas */
+.task-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* Estilos para tareas completadas */
+.task-item.completed {
+    border-left-color: #28a745;
+    opacity: 0.8;
+}
+
+.task-item.completed .task-text {
+    text-decoration: line-through;
+    color: #6c757d;
+}
+
+/* ===== BOTONES DE ACCIÓN ===== */
+/* Manejo de visibilidad para los botones de acción */
+.task-actions {
+    visibility: hidden;
+    opacity: 0;
+    transition: all 0.2s;
+}
+
+.task-item:hover .task-actions {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* ===== ENCABEZADO DE LA APLICACIÓN ===== */
+.app-header {
+    background-color: rgba(67, 97, 238, 0.9);
+    color: white;
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 20px;
+}
+
+/* ===== ESTADO VACÍO ===== */
+#empty-state {
+    color: #6c757d;
+}
